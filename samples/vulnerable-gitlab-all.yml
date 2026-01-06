@@ -1,0 +1,38 @@
+stages:
+  - build
+  - test
+  - deploy
+
+# Triggers GitLabInsecureIncludesRule:
+include:
+  - remote: "https://gitlab.example.com/group/templates/-/raw/main/ci.yml"
+  - project: "group/security/templates"
+    file: "/pipelines/common.yml"
+
+# Triggers GitLabSecretsExposureRule:
+variables:
+  DEPLOY_PASSWORD: "SuperSecretPassword123456"
+  AWS_SECRET_ACCESS_KEY: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+
+build:
+  stage: build
+  image: "docker:dind" # Triggers GitLabPrivilegedRunnerRule (DinD image)
+  privileged: true # Triggers GitLabPrivilegedRunnerRule
+  services:
+    - name: "docker:dind" # Triggers GitLabPrivilegedRunnerRule (service DinD)
+      privileged: true # Triggers GitLabPrivilegedRunnerRule
+  script:
+    - echo "Job token: $CI_JOB_TOKEN" # Triggers GitLabSecretsExposureRule
+    - curl -H "JOB-TOKEN: $CI_JOB_TOKEN" "https://gitlab.example.com/api/v4/projects" # Triggers GitLabSecretsExposureRule
+    - echo "building"
+  artifacts:
+    paths: # Triggers GitLabArtifactExposureRule
+      - dist/
+      - .env
+      - keys/deploy.key
+      - credentials.txt
+
+test:
+  stage: test
+  script:
+    - echo "tests"

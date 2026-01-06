@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "dangerous_fd_patterns": [
+    "/var/run/docker\\.sock$",
+    "/run/containerd/containerd\\.sock$",
+    "/run/crio/crio\\.sock$",
+    "/proc/kcore$",
+    "/dev/(mem|kmem)$",
+    "/etc/shadow$"
+  ],
+  "secret_fd_patterns": [
+    "(?i)\\.aws/credentials$",
+    "(?i)\\.kube/config$",
+    "(?i)\\.ssh/(id_rsa|id_ed25519)$",
+    "(?i)(secret|credential|token|passwd|password|\\.pem|\\.key)$"
+  ]
+}

@@ -1,0 +1,30 @@
+stages:
+  - build
+  - deploy
+
+include:
+  - remote: "https://gitlab.example.com/group/templates/-/raw/main/ci.yml"
+  - project: "group/security/templates"
+    file: "/pipelines/base.yml"
+
+variables:
+  AWS_SECRET_ACCESS_KEY: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+  DEPLOY_PASSWORD: "SuperSecretPassword123456"
+
+build:
+  stage: build
+  image: "docker:dind"
+  privileged: true
+  services:
+    - name: "docker:dind"
+      privileged: true
+  script:
+    - echo "Token is $CI_JOB_TOKEN"
+    - curl -H "JOB-TOKEN: $CI_JOB_TOKEN" https://gitlab.example.com/api/v4/projects
+    - echo "build"
+  artifacts:
+    paths:
+      - dist/
+      - .env
+      - keys/deploy.key
+      - credentials.txt
